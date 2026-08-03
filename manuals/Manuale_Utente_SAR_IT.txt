@@ -1,0 +1,273 @@
+Contenuti
+
+1. Scopo e campo di applicazione
+
+2. Installazione e primo avvio
+
+3. Avvio rapido
+
+4. Configurazione dell’esperimento
+
+5. Progettazione degli esperimenti
+
+6. Esecuzione e osservazione
+
+7. File di output
+
+8. Metriche e interpretazione
+
+9. Cartella di lavoro delle analisi statistiche
+
+10. Checklist di riproducibilità
+
+11. Risoluzione dei problemi
+
+12. Struttura dei file
+
+1. Scopo e campo di applicazione
+
+SAR simulation environment è un’applicazione Python per valutare strategie di esplorazione Search and Rescue multipiano con un robot quadrupede simulato. Il software genera edifici riproducibili, esegue tutte le condizioni Fw e Opt richieste sullo stesso ambiente e sulla stessa posa iniziale, visualizza l’esplorazione ed esporta statistiche descrittive e inferenziali.
+
+2. Installazione e primo avvio
+
+2.1 Requisiti
+
+Python 3.10 o successivo.
+
+Un ambiente desktop per Tkinter, Pygame, Matplotlib e la finestra Panda3D opzionale.
+
+Una GPU è consigliata, ma non obbligatoria, per la vista 3D.
+
+2.2 Installazione delle dipendenze
+
+Aprire un terminale nella cartella della distribuzione. È consigliato un ambiente virtuale:
+
+python -m venv .venv
+
+.venv\Scripts\activate   # Windows
+
+source .venv/bin/activate   # Linux/macOS
+
+python -m pip install -r requirements.txt
+
+2.3 Avvio del programma
+
+python main.py
+
+La schermata iniziale mostra il logo SAR, il titolo, gli autori e la selezione della lingua. Scegliere English o Italiano e premere Continua. La scelta si applica alla configurazione, al viewer, alle finestre dei risultati e ai messaggi della console. Apri manuale apre il PDF corrispondente alla lingua selezionata.
+
+3. Avvio rapido
+
+Eseguire python main.py.
+
+Selezionare Italiano e premere Continua.
+
+Per una prova rapida, impostare Numero di edifici casuali a 1 e Tr a 60 s.
+
+Premere Avvia simulazione.
+
+Usare SPAZIO per la pausa, i tasti 1-4 per la velocità e Max Turbo per l’esecuzione più rapida.
+
+Esaminare le tabelle finali e i file CSV e XLSX generati.
+
+4. Configurazione dell’esperimento
+
+La finestra è divisa in parametri del batch, pesi fissi del planner e impostazioni dell’ambiente. Solo Fw e Opt producono il prodotto cartesiano delle condizioni; tutti gli altri valori restano invariati nel batch.
+
+4.1 Parametri del batch
+
+4.2 Pesi fissi del planner
+
+4.3 Impostazioni dell’ambiente
+
+5. Progettazione degli esperimenti
+
+5.1 Numero di episodi
+
+Episodi totali = numero di edifici x numero di valori Fw x numero di valori Opt. Per esempio, 170 edifici, tre valori Fw e due valori Opt producono 1.020 episodi.
+
+5.2 Confronti equi
+
+Per ogni edificio il programma valida una posa iniziale utilizzabile in tutte le condizioni. Edificio e posa vengono riutilizzati per l’intero batch Fw x Opt. Se il robot non riesce a pianificare un percorso o a traslare nell’intervallo diagnostico, viene selezionata una nuova posa prima di accettare qualsiasi episodio di quell’edificio.
+
+5.3 Dimensioni suggerite
+
+6. Esecuzione e osservazione
+
+Il pannello sinistro mostra la geometria ground truth continua. Il pannello destro mostra la mappa probabilistica e semantica costruita dal robot. La legenda separa ambiente reale, robot e sensori, pianificazione e stati della mappa interna.
+
+6.1 Diagnostica dello start
+
+Prima del batch di un edificio, una breve esecuzione invisibile verifica che il robot riesca a pianificare e a traslare. L’avanzamento è mostrato nel viewer persistente. Un watchdog impedisce che mappe patologiche facciano apparire il programma bloccato.
+
+6.2 Max Turbo e vista 3D
+
+Max Turbo sospende il rendering costoso ma non modifica il passo fisico deterministico. La preferenza della vista 3D viene conservata e la finestra Panda3D viene ripristinata quando Max Turbo viene disattivato, se era stata abilitata.
+
+7. File di output
+
+8. Metriche e interpretazione
+
+8.1 Interpretazione congiunta
+
+Un Af elevato con Atot basso può indicare che il robot ha esplorato molto bene pochi piani. Vf o Cf elevati non implicano automaticamente Atot elevato, perché le transizioni consumano Ts. La strategia desiderata bilancia copertura locale e passaggio tempestivo agli altri piani.
+
+9. Cartella di lavoro delle analisi statistiche
+
+9.1 Effect size
+
+L’ANOVA usa eta squared: quota di varianza totale associata all’appartenenza ai gruppi.
+
+Welch e Tukey-Kramer usano Hedges g: differenza standardizzata corretta per il bias tra due medie.
+
+Significatività statistica e rilevanza pratica sono complementari; riportare p-value ed effect size.
+
+9.2 Relazione tempo-area
+
+Il software confronta modelli lineare, quadratico, logaritmico, radice quadrata ed esponenziale saturante tramite AICc. Un modello non lineare viene selezionato solo se il vantaggio è sufficiente; altrimenti viene mantenuta la descrizione lineare più parsimoniosa.
+
+10. Checklist di riproducibilità
+
+Archiviare la distribuzione completa e requirements.txt.
+
+Registrare tutti i valori di configurazione e la versione del software.
+
+Conservare il seed iniziale e il numero di edifici.
+
+Usare gli stessi edifici in tutte le condizioni confrontate.
+
+Copiare o rinominare i file di output prima di un nuovo esperimento nella stessa cartella.
+
+Riportare metriche, test statistici, correzione per confronti multipli ed effect size.
+
+11. Risoluzione dei problemi
+
+12. Struttura dei file
+
+main.py orchestra l’esperimento; gui.py implementa le interfacce Tk, Pygame e Matplotlib; simulation.py contiene lo stato della run e le metriche; building.py genera gli ambienti; planner.py seleziona le frontiere; robot.py implementa sensori e movimento; camera3d.py renderizza la vista in prima persona; statistical_analysis.py crea analisi ed export Excel; i18n.py contiene le traduzioni; welcome.py implementa la schermata iniziale bilingue.
+
+Principio fondamentale  Nello stesso edificio, ogni condizione Fw x Opt usa la medesima geometria e la stessa posa iniziale validata. I confronti tra condizioni risultano quindi equi e riproducibili.
+
+Opzione | Default | Significato e indicazioni
+
+Numero di piani N | 4 | Numero di piani in ogni edificio. Minimo: 2.
+
+Durata della run Tr [s] | 600 | Budget temporale totale assegnato a un episodio.
+
+Costo cambio piano Ts [s] | 60 | Tempo sottratto al budget a ogni cambio piano. Non incrementa t_expl.
+
+Numero di edifici casuali | 5 | Seed indipendenti. Aumentare il valore per confronti statistici stabili.
+
+Seed iniziale globale | 0 | Seed del primo edificio. L’edificio i usa base_seed + i.
+
+Fw combinatorio | 0; 0.3; 1 | Uno o più valori non negativi separati da punto e virgola o virgola.
+
+Opt combinatorio | ON; OFF | Una o entrambe le modalità. Sono eseguite tutte le combinazioni Fw x Opt.
+
+Parametro | Default | Ruolo
+
+Iw | 1 | Premia il guadagno di informazione atteso della frontiera.
+
+Dw | 1 | Penalizza la distanza di viaggio.
+
+Vw | 0.3 | Penalizza il termine di vicinanza del planner.
+
+Cw | 3 | Penalità di curvatura con Opt=ON; limita percorsi inutilmente curvi.
+
+Ow | 8 | Penalità di orientamento con Opt=ON; limita deviazioni dalla direzione preferita.
+
+Wp | 24 | Premio di persistenza della frontiera; riduce cambi rapidi del target.
+
+Ms | 1 | Vantaggio minimo richiesto per cambiare target.
+
+Indicazione sperimentale  Quando possibile, modificare una sola famiglia di parametri alla volta. Registrare tutti i valori, il seed e la versione del software nel diario di laboratorio.
+
+Opzione | Scelte | Significato
+
+Topologia | Piani tipo ufficio / Topologia libera | I piani tipo ufficio contengono stanze e corridoi; la topologia libera è meno strutturata.
+
+Aggiungi sedie, tavoli e macerie | Abilitato / Disabilitato | Aggiunge ostacoli fisici e i corrispondenti elementi visivi 2D/3D.
+
+Densità oggetti | 1-4 | Scala la quantità di ostacoli. Valori elevati rendono navigazione e generazione più impegnative.
+
+Scopo | Configurazione suggerita
+
+Controllo interfaccia | 1 edificio, Tr=30-60 s, un valore Fw e un valore Opt.
+
+Studio pilota | 10-30 edifici con tutte le condizioni previste.
+
+Esperimento per pubblicazione | Usare un numero sufficiente di edifici; mantenere gli stessi edifici tra condizioni e riportare il disegno completo.
+
+Controllo | Azione
+
+SPAZIO | Mette in pausa o riprende l’episodio.
+
+1 / 2 / 3 / 4 | Imposta la velocità 1x, 2x, 4x o 8x.
+
+Max Turbo | Congela il rendering ed esegue i passi simulati alla massima velocità possibile.
+
+Abilita vista 3D | Apre la telecamera Panda3D in prima persona per l’edificio corrente.
+
+ESC | Termina l’episodio corrente.
+
+File | Contenuto
+
+sar_simulation_results.csv | Una riga per episodio: configurazione, coverage, attività tra piani, tempo e metriche SAR.
+
+sar_simulation_condition_statistics.csv | Medie e SD campionarie di Af, Af* e Atot per ogni condizione Fw/Opt.
+
+sar_simulation_time_area_relationship.csv | Correlazioni, regressione, selezione del modello e conclusioni per t_expl e Atot.
+
+sar_simulation_analysis.xlsx | Risultati grezzi, riepiloghi, ANOVA, Tukey-Kramer, Welch, analisi per Fw, modelli tempo-area e note.
+
+Metrica | Definizione | Interpretazione
+
+Af | Media della percentuale esplorata sui piani visitati. | Quanto accuratamente sono stati coperti i piani raggiunti.
+
+Af* | Percentuale esplorata sul piano iniziale. | Copertura del piano di partenza.
+
+Atot | Area esplorata divisa per l’area esplorabile totale di tutti i piani. | Misura globale principale.
+
+Vf | Numero di piani distinti visitati. | Estensione verticale dell’esplorazione.
+
+Cf | Numero di cambi piano. | Frequenza degli spostamenti verticali.
+
+t_expl | Tempo simulato effettivamente dedicato all’esplorazione. | Ts riduce il budget ma non viene aggiunto a t_expl.
+
+TP / FP / FN / TN | Valori della matrice di confusione per il rilevamento delle vittime. | Usati per sensibilità, specificità, balanced accuracy e MCC.
+
+Foglio | Interpretazione
+
+Run results | Osservazioni per episodio, utilizzabili per analisi e grafici personalizzati.
+
+Condition stats | Statistiche descrittive per ogni condizione Fw/Opt.
+
+ANOVA conditions | ANOVA omnibus tra tutte le condizioni. Un p significativo indica almeno una differenza.
+
+Tukey conditions | Confronti pairwise; usare p_bonferroni o reject_0.05_bonferroni.
+
+Welch Opt | Opt=ON contro Opt=OFF aggregando Fw; Hedges g è l’effect size.
+
+ANOVA Fw | Confronto tra livelli Fw aggregando Opt; eta squared è l’effect size omnibus.
+
+Tukey Fw | Confronti pairwise tra Fw con Bonferroni e Hedges g.
+
+Time-area relation | Pearson, Spearman, pendenza lineare, modello selezionato e conclusione per t_expl e Atot.
+
+Time-area models | Diagnostica per modelli lineare, quadratico, logaritmico, radice quadrata ed esponenziale saturante.
+
+Notes | Definizioni e indicazioni interpretative.
+
+Problema | Soluzione
+
+Pygame non installato | Eseguire python -m pip install pygame-ce o reinstallare requirements.txt.
+
+La vista 3D non si apre | Installare Panda3D, aggiornare i driver grafici e provare fuori da desktop remoto.
+
+Edificio non inizializzabile | Ridurre la densità oggetti o cambiare seed; gli errori strutturali sono riportati esplicitamente.
+
+Lentezza tra due edifici | La diagnostica sta validando l’edificio successivo. Osservare la barra o abilitare Max Turbo.
+
+Test inferenziali poco informativi | Aumentare il numero di edifici per avere osservazioni ripetute in ogni condizione.
+
+File sovrascritti | Spostare o rinominare CSV/XLSX prima dell’esperimento successivo.
