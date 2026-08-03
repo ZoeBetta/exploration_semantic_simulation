@@ -2,7 +2,7 @@
 
 **Authors:** Zoe Betta and Antonio Sgorbissa
 
-This distribution extends version 39 with a bilingual welcome screen and a fully localised user interface.
+SAR simulation environment is a Python application for evaluating multi-floor Search and Rescue exploration strategies with a simulated quadruped robot.
 
 ## Quick start
 
