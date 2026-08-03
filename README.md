@@ -1,4 +1,4 @@
-# SAR simulation environment - Version 40 (bilingual)
+# SAR simulation environment 
 
 **Authors:** Zoe Betta and Antonio Sgorbissa
 
